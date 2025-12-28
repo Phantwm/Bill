@@ -1,0 +1,153 @@
+all code must be extremely simple and minimal and using efficient code with the goal to reduce the amount of lines to the bare minimum while keeping full functionality, as simple as fucking possible, least lines of code possible
+
+keep consistent code with other modules, if 2 things do the same thing use the same methods and stuff, consistency is key
+
+dont use any functions or variables or anything, theres no point defining code in point A then calling it and using it in point B, just put the code at point B in general, inline everything
+
+dont use colour codes unless its minecraft
+
+# ✅ README – Development & Message Formatting Standards
+
+---
+
+## 📩 1. MESSAGE FORMAT RULES
+
+All system messages must follow these standards.
+
+### **1.1 Core Principles**
+- One message = one idea.
+- Short, clear, no filler words.
+- Neutral and professional tone.
+- End every sentence with a period.
+- No emojis, no exclamation marks, no unnecessary punctuation.
+
+### **1.2 Color Codes**
+| Purpose | Code |
+|---------|------|
+| ✅ Success | `&a` |
+| ❌ Error / Denial | `&c` |
+| ℹ️ Info / Help | `&f` |
+
+**Only one color per message.**
+
+### **1.3 System Errors vs User Errors**
+There are two types of errors:
+
+| Error Type | Example Scenarios | Message Format |
+|------------|--------------------|----------------|
+| **User-caused (Intentional)** | No permission, missing item, invalid command, cooldown | Specific: `&cNo permission.` |
+| **System/Internal/Code Error** | Exceptions, API failure, null pointer, backend crash | Generic only: `&cAction failed.` |
+
+**System errors must never reveal technical reasons, stack traces, or internal details.**
+
+✔ Allowed:
+```
+&cAction failed.
+&cOperation failed.
+&cRequest failed.
+```
+
+❌ Not allowed:
+```
+&cNullPointerException on line 54.
+&cDatabase connection failed.
+&cAttack failed because target was null.
+```
+
+### **1.4 Message Format Templates**
+
+| Type | Template |
+|------|----------|
+| Success | `&a<Action completed>.` |
+| Error | `&c<Action failed>.` or `&cNo permission.` |
+| Info | `&f<Instruction or neutral message>.` |
+
+### **1.5 Placeholder Rules**
+- Use `{placeholder}` only when needed.
+- Must be lowercase: `{user}`, `{item}`, `{value}`, `{from}`, `{to}`
+- No `< > ( ) [ ]` or quotes around placeholders.
+
+Examples:
+```
+&aItem {item} added.
+&cItem {item} not found.
+&aOwnership transferred from {from} to {to}.
+```
+
+---
+
+## ⚙️ 2. CODE & PROJECT STRUCTURE RULES
+
+This section defines how code must be structured, written, and organized.
+
+### **2.1 Code Style Philosophy**
+- Extremely simple and minimal.
+- As little code as possible without losing functionality.
+- No redundant, unused, or duplicated logic unless it keeps things simpler.
+- Focus on performance: minimal CPU, RAM, and tick usage.
+- Runtime performance is more important than faster loading times.
+- Readable and direct code is preferred over abstraction and complexity.
+
+### **2.2 AI Usage Rules (If Using AI for Code)**
+- AI must only generate what is specifically requested.
+- No extra features, utils, abstractions, or improvements unless explicitly asked for.
+- No assumptions, no “I thought this would be helpful.”
+- If it isn't requested, it must not be created.
+
+### **2.3 File & Class Structure Rules**
+- **Each command must have its own file.**
+
+Examples:
+```
+kitcreate.java
+clanchattoggle.java
+claninvite.java
+```
+
+- **Group related commands in folders/packages:**
+```
+/kits       → all kit commands
+/clans      → all clan-related commands
+/chat       → chat-related commands
+```
+
+- **Keep file names simple and readable.**
+  - ✅ `usermanagement.java`
+  - ❌ `UserManagementHelperServiceUtil.java`
+
+### **2.4 Minimize Utils / Events / Mixins**
+- Only create an event, util, or mixin when absolutely necessary.
+- Avoid large utility classes with random functions.
+- Prefer keeping logic inside the command file — even if it means repeating a few lines.
+- Simplicity is more important than abstraction.
+
+### **2.5 Performance Rules**
+- Use as little CPU and RAM as possible.
+- No pointless loops, complex data structures, or expensive calculations.
+- Avoid unnecessary schedulers, timers, tick-based checks.
+- Only use async or multithreading when required.
+- Avoid heavy reflection, streams, and caching unless needed.
+
+### **2.6 Forbidden Practices**
+❌ No over-engineered class names like `PlayerEntityInteractionManagerService`.  
+❌ No unused or commented-out junk code.  
+❌ No giant utility or helper classes for simple actions.  
+❌ No unnecessary design patterns (factories, builders, dependency injection).  
+❌ No excessive events or mixins when simple direct method calls work.
+
+---
+
+## ✅ 3. SUMMARY
+
+✔ Messages follow strict `&a`, `&c`, `&f` rules.  
+✔ System errors must be generic — no explanations or internal info.  
+✔ Code must be minimal, efficient, and extremely simple.  
+✔ One command = one file.  
+✔ Commands are grouped into folders by feature (kits, clans, etc).  
+✔ Avoid big utility/event/mixin files unless necessary.  
+✔ AI must not add anything unless explicitly told to.  
+✔ Focus on performance and low resource usage over fancy architecture.
+
+---
+
+End of README.
