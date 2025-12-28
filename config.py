@@ -1,10 +1,10 @@
 gamemodes = [
-    ("Sword", "⚔️"),
+    ("Sword", "🔪"),
     ("DiamondPot", "💎"),
     ("NetheritePot", "🧪"),
     ("Axe", "🪓"),
     ("UHC", "🕸️"),
-    ("SMP", "🛡️"),
+    ("SMP", "🏹"),
     ("Mace", "🔨"),
     ("Crystal", "🔮")
 ]
