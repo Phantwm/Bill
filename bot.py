@@ -29,4 +29,4 @@ async def on_ready():
     except Exception as e:
         print(f'Failed to sync commands: {e}')
 
-bot.run(os.getenv('DISCORD'))
+bot.run(os.getenv('DISCORD_TOKEN'))
