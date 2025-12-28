@@ -51,9 +51,10 @@ conn.commit()
 def add_trainer(gamemode, user_id):
     defaults = ("Example", "10", 3092790, "# **This** __is__ *an* ~~example~~ `description`\n\n## **This** __is__ *an* ~~example~~ `description`\n\n### **This** __is__ *an* ~~example~~ `description`\n\n**This** __is__ *an* ~~example~~ `description`\n\n-# **This** __is__ *an* ~~example~~ `description`", 1, 0)
     cursor = conn.cursor()
-    cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description, active, lessons) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (gamemode, user_id, *defaults))
-    cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = COALESCE(price, %s), colour = COALESCE(colour, %s), description = COALESCE(description, %s), active = COALESCE(active, %s), lessons = COALESCE(lessons, %s) WHERE gamemode = %s AND user_id = %s', (*defaults, gamemode, user_id))
-    conn.commit()
+    cursor.execute('SELECT COUNT(*) FROM trainers WHERE gamemode = %s AND user_id = %s', (gamemode, user_id))
+    if cursor.fetchone()[0] == 0:
+        cursor.execute('INSERT INTO trainers (gamemode, user_id, ign, price, colour, description, active, lessons) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (gamemode, user_id, *defaults))
+        conn.commit()
 
 def get_panel_message_id(gamemode, user_id):
     cursor = conn.cursor()

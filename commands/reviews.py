@@ -29,9 +29,8 @@ class ReviewModal(discord.ui.Modal, title="Submit Review"):
             await interaction.response.send_message("Invalid rating", ephemeral=True)
             return
         import re
-        gamemode = re.search(r'Your (.+?) by', self.message.content).group(1)
+        gamemode = re.search(r'Your (.+?) lesson by', self.message.content).group(1)
         trainer_id = int(re.search(r'<@(\d+)>', self.message.content).group(1))
-        database.add_trainer(gamemode, trainer_id)
         trainer_ign = database.get_trainer_ign(gamemode, trainer_id) or "Unknown"
         embed = discord.Embed(title=f"New {gamemode} review of {trainer_ign}!", description=f"{'⭐' * int(rating_value)}\n\n{self.review_input.value}")
         embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{trainer_ign}")
