@@ -13,5 +13,5 @@ guild_id = 1454008830307602579
 
 channel_format = "{emoji}┃{gamemode}"
 ticket_category = "Tickets"
-review_channel = "reviews"
+review_channel = "⭐┃reviews"
 
