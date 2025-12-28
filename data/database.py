@@ -84,25 +84,25 @@ _defaults = ("Example", "10", 3092790, "# **This** __is__ *an* ~~example~~ `desc
 def set_panel_ign(gamemode, user_id, ign):
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
-    cursor.execute('UPDATE trainers SET ign = %s, price = COALESCE(price, %s), colour = COALESCE(colour, %s), description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (ign, *_defaults[:4], gamemode, user_id))
+    cursor.execute('UPDATE trainers SET ign = %s, price = COALESCE(price, %s), colour = COALESCE(colour, %s), description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (ign, _defaults[1], _defaults[2], _defaults[3], gamemode, user_id))
     conn.commit()
 
 def set_panel_price(gamemode, user_id, price):
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
-    cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = %s, colour = COALESCE(colour, %s), description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (*_defaults[:3], price, _defaults[3], gamemode, user_id))
+    cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = %s, colour = COALESCE(colour, %s), description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (_defaults[0], price, _defaults[2], _defaults[3], gamemode, user_id))
     conn.commit()
 
 def set_panel_colour(gamemode, user_id, colour):
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
-    cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = COALESCE(price, %s), colour = %s, description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (*_defaults[:2], colour, _defaults[3], gamemode, user_id))
+    cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = COALESCE(price, %s), colour = %s, description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (_defaults[0], _defaults[1], colour, _defaults[3], gamemode, user_id))
     conn.commit()
 
 def set_panel_description(gamemode, user_id, description):
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
-    cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = COALESCE(price, %s), colour = COALESCE(colour, %s), description = %s WHERE gamemode = %s AND user_id = %s', (*_defaults[:3], description, gamemode, user_id))
+    cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = COALESCE(price, %s), colour = COALESCE(colour, %s), description = %s WHERE gamemode = %s AND user_id = %s', (_defaults[0], _defaults[1], _defaults[2], description, gamemode, user_id))
     conn.commit()
 
 def add_ticket(channel_id, trainer_id, customer_id, gamemode):
