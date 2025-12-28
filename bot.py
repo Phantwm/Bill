@@ -21,8 +21,8 @@ async def on_ready():
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'commands'))
     import purchase
     await purchase.setup(bot)
-    import review_submission
-    await review_submission.setup(bot)
+    import reviews
+    await reviews.setup(bot)
     try:
         synced = await bot.tree.sync()
         print(f'Synced {len(synced)} command(s)')

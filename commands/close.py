@@ -25,9 +25,9 @@ async def setup(bot):
         try:
             import sys, os
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
-            import review_submission
+            import reviews
             trainer = await interaction.client.fetch_user(trainer_id)
-            await (await interaction.client.fetch_user(ticket_info["customer_id"])).send(f"Your {gamemode} lesson by {trainer.mention} was completed.\n\nWould you like to submit a review?", view=review_submission.ReviewSubmissionView())
+            await (await interaction.client.fetch_user(ticket_info["customer_id"])).send(f"Your {gamemode} lesson by {trainer.mention} was completed.\n\nWould you like to submit a review?", view=reviews.ReviewSubmissionView())
         except:
             pass
         message_id = database.get_panel_message_id(gamemode, trainer_id)
