@@ -12,19 +12,11 @@ class DenyModal(discord.ui.Modal, title="Deny Request"):
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        for item in self.view.children:
-            item.disabled = True
+        [setattr(i, 'disabled', True) for i in self.view.children]
         await self.message.edit(view=self.view)
-        user_mention_match = re.search(r'<@(\d+)>', self.embed.description)
-        gamemode_match = re.search(r'\*\*Gamemode:\*\* .+? (.+)', self.embed.description)
-        if not user_mention_match or not gamemode_match:
-            await interaction.followup.send("Error: Could not find user or gamemode.", ephemeral=True)
-            return
-        requester_id = int(user_mention_match.group(1))
-        gamemode = gamemode_match.group(1)
-        requester = await interaction.client.fetch_user(requester_id)
-        message = f"Your {gamemode} training request has been denied.\n\nReason: {self.reason_input.value}"
-        await requester.send(message)
+        requester_id = int(re.search(r'<@(\d+)>', self.embed.description).group(1))
+        gamemode = re.search(r'\*\*Gamemode:\*\* .+? (.+)', self.embed.description).group(1)
+        await (await interaction.client.fetch_user(requester_id)).send(f"Your {gamemode} training request has been denied.\n\nReason: {self.reason_input.value}")
         await interaction.followup.send("Request denied.", ephemeral=True)
 
 async def setup(bot):

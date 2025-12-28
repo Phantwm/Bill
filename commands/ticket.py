@@ -18,10 +18,7 @@ async def create_ticket(guild: discord.Guild, gamemode: str, trainer: discord.Us
     except:
         return None
     
-    trainer_name = re.sub(r'[^a-z0-9-]', '', trainer.name.lower())[:20] or "user"
-    requester_name = re.sub(r'[^a-z0-9-]', '', requester.name.lower())[:20] or "user"
-    gamemode_name = re.sub(r'[^a-z0-9-]', '', gamemode.lower())[:20] or "user"
-    channel_name = f"{gamemode_name}-{trainer_name}-{requester_name}"[:100]
+    channel_name = f"{re.sub(r'[^a-z0-9-]', '', gamemode.lower())[:20] or 'user'}-{re.sub(r'[^a-z0-9-]', '', trainer.name.lower())[:20] or 'user'}-{re.sub(r'[^a-z0-9-]', '', requester.name.lower())[:20] or 'user'}"[:100]
     
     overwrites = {
         guild.default_role: discord.PermissionOverwrite(view_channel=False),

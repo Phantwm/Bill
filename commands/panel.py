@@ -27,61 +27,47 @@ class PanelView(discord.ui.View):
     async def edit_description(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user_id:
             return
-        data = database.get_panel_data(self.gamemode, interaction.user.id)
-        current_description = data["description"] or ""
-        await interaction.response.send_modal(DescriptionModal(self, current_description))
+        await interaction.response.send_modal(DescriptionModal(self, database.get_panel_data(self.gamemode, interaction.user.id)["description"] or ""))
 
     @discord.ui.button(label="Edit Colour", style=discord.ButtonStyle.primary)
     async def edit_colour(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user_id:
             return
-        data = database.get_panel_data(self.gamemode, interaction.user.id)
-        current_colour = f"#{data['colour']:06x}"
-        await interaction.response.send_modal(ColourModal(self, current_colour))
+        await interaction.response.send_modal(ColourModal(self, f"#{database.get_panel_data(self.gamemode, interaction.user.id)['colour']:06x}"))
 
     @discord.ui.button(label="Edit Price", style=discord.ButtonStyle.primary)
     async def edit_price(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user_id:
             return
-        data = database.get_panel_data(self.gamemode, interaction.user.id)
-        current_price = data["price"]
-        await interaction.response.send_modal(PriceModal(self, current_price))
+        await interaction.response.send_modal(PriceModal(self, database.get_panel_data(self.gamemode, interaction.user.id)["price"]))
 
     @discord.ui.button(label="Edit IGN", style=discord.ButtonStyle.primary)
     async def set_ign(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user_id:
             return
-        data = database.get_panel_data(self.gamemode, interaction.user.id)
-        current_ign = data["ign"]
-        await interaction.response.send_modal(IGNModal(self, current_ign))
+        await interaction.response.send_modal(IGNModal(self, database.get_panel_data(self.gamemode, interaction.user.id)["ign"]))
 
     @discord.ui.button(label="Save", style=discord.ButtonStyle.success)
     async def save(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user_id:
             return
         emoji = next((e for n, e in config.gamemodes if n == self.gamemode), "")
-        channel_name = config.channel_format.format(emoji=emoji, gamemode=self.gamemode)
-        channel = next((c for c in interaction.guild.channels if c.name.lower() == channel_name.lower()), None)
-        if not channel:
-            await interaction.response.send_message("Channel not found.", ephemeral=True)
-            return
-        import sys
-        import os
+        channel = next((c for c in interaction.guild.channels if c.name.lower() == config.channel_format.format(emoji=emoji, gamemode=self.gamemode).lower()), None)
+        import sys, os
         sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
         import purchase
         data = database.get_panel_data(self.gamemode, interaction.user.id)
         self.embed.set_footer(text=f"{data['ign']} has completed {data['lessons']} lessons.")
-        purchase_view = purchase.PurchaseView(active=data["active"])
+        view = purchase.PurchaseView(active=data["active"])
         message_id = database.get_panel_message_id(self.gamemode, interaction.user.id)
-        if message_id:
-            try:
-                await (await channel.fetch_message(message_id)).edit(embed=self.embed, view=purchase_view)
+        try:
+            if message_id:
+                await (await channel.fetch_message(message_id)).edit(embed=self.embed, view=view)
                 await interaction.response.edit_message(content="Panel updated.", embed=None, view=None)
-            except:
-                message_id = None
-        if not message_id:
-            msg = await channel.send(embed=self.embed, view=purchase_view)
-            database.set_panel_message_id(self.gamemode, interaction.user.id, msg.id)
+            else:
+                raise
+        except:
+            database.set_panel_message_id(self.gamemode, interaction.user.id, (await channel.send(embed=self.embed, view=view)).id)
             await interaction.response.edit_message(content="Panel created.", embed=None, view=None)
 
 class DescriptionModal(discord.ui.Modal, title="Edit Description"):
@@ -92,11 +78,9 @@ class DescriptionModal(discord.ui.Modal, title="Edit Description"):
         self.add_item(self.description_input)
 
     async def on_submit(self, interaction: discord.Interaction):
-        description = self.description_input.value
-        database.set_panel_description(self.view.gamemode, interaction.user.id, description)
+        database.set_panel_description(self.view.gamemode, interaction.user.id, self.description_input.value)
         data = database.get_panel_data(self.view.gamemode, interaction.user.id)
-        price_text = f"**💸 Price: ${data['price']} USD**"
-        self.view.embed.description = data['description'] + "\n\n" + price_text
+        self.view.embed.description = data['description'] + "\n\n" + f"**💸 Price: ${data['price']} USD**"
         self.view.embed.set_footer(text=f"{data['ign']} has completed {data['lessons']} lessons.")
         await interaction.response.edit_message(embed=self.view.embed, view=self.view)
 
@@ -114,8 +98,7 @@ class PriceModal(discord.ui.Modal, title="Edit Price"):
             return
         database.set_panel_price(self.view.gamemode, interaction.user.id, price_value if price_value else None)
         data = database.get_panel_data(self.view.gamemode, interaction.user.id)
-        price_text = f"**💸 Price: ${data['price']} USD**"
-        self.view.embed.description = data['description'] + "\n\n" + price_text
+        self.view.embed.description = data['description'] + "\n\n" + f"**💸 Price: ${data['price']} USD**"
         self.view.embed.set_footer(text=f"{data['ign']} has completed {data['lessons']} lessons.")
         await interaction.response.edit_message(embed=self.view.embed, view=self.view)
 
@@ -156,8 +139,7 @@ class IGNModal(discord.ui.Modal, title="Edit IGN"):
         await interaction.response.edit_message(embed=self.view.embed, view=self.view)
 
 async def setup(bot):
-    import sys
-    import os
+    import sys, os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
     import purchase
     @bot.tree.command(name="panel")
@@ -172,16 +154,11 @@ async def setup(bot):
         database.add_trainer(gamemode, interaction.user.id)
         data = database.get_panel_data(gamemode, interaction.user.id)
         emoji = next((e for n, e in config.gamemodes if n == gamemode), "")
-        title = f"{emoji} {gamemode} Trainer - {data['ign']}" if emoji else f"{gamemode} Trainer - {data['ign']}"
-        price_text = f"**💸 Price: ${data['price']} USD**"
-        embed = discord.Embed(title=title, description=data['description'] + "\n\n" + price_text, color=data['colour'])
+        embed = discord.Embed(title=f"{emoji} {gamemode} Trainer - {data['ign']}" if emoji else f"{gamemode} Trainer - {data['ign']}", description=data['description'] + "\n\n" + f"**💸 Price: ${data['price']} USD**", color=data['colour'])
         embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{data['ign']}")
         embed.set_footer(text=f"{data['ign']} has completed {data['lessons']} lessons.")
         view = PanelView(gamemode, interaction.user.id, embed, data["active"])
-        for child in view.children:
-            if child == view.toggle_active:
-                child.label = "Set inactive" if data["active"] else "Set active"
-                break
+        [setattr(c, 'label', "Set inactive" if data["active"] else "Set active") for c in view.children if c == view.toggle_active]
         await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
     @panel.autocomplete('gamemode')
