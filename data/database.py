@@ -70,7 +70,7 @@ def get_trainer_by_message(message_id):
 
 def set_panel_message_id(gamemode, user_id, message_id):
     cursor = conn.cursor()
-    cursor.execute('REPLACE INTO trainers (gamemode, user_id, message_id) VALUES (%s, %s, %s)', (gamemode, user_id, message_id))
+    cursor.execute('UPDATE trainers SET message_id = %s WHERE gamemode = %s AND user_id = %s', (message_id, gamemode, user_id))
     conn.commit()
 
 def get_panel_data(gamemode, user_id):
