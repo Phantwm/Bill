@@ -9,7 +9,7 @@ gamemodes = [
     ("Crystal", "🔮")
 ]
 
-guild_id = 1454016552792752219
+guild_id = 1454008830307602579
 
 channel_format = "{emoji}┃{gamemode}"
 ticket_category = "Tickets"
