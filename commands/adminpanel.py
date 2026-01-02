@@ -135,9 +135,10 @@ class AdminIGNModal(discord.ui.Modal, title="Edit IGN"):
         self.add_item(self.ign_input)
 
     async def on_submit(self, interaction: discord.Interaction):
+        from urllib.parse import quote
         ign = self.ign_input.value.strip()
         database.set_panel_ign(self.view.gamemode, self.view.user_id, ign)
-        self.view.embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{ign}")
+        self.view.embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{quote(ign)}")
         emoji = next((e for n, e in config.gamemodes if n == self.view.gamemode), "")
         self.view.embed.title = f"{emoji} {self.view.gamemode} Trainer - {ign}" if emoji else f"{self.view.gamemode} Trainer - {ign}"
         data = database.get_panel_data(self.view.gamemode, self.view.user_id)
@@ -155,11 +156,12 @@ async def setup(bot):
         if not any(r.name == "Owner" for r in member.roles):
             await interaction.response.send_message("No permission.", ephemeral=True)
             return
+        from urllib.parse import quote
         database.add_trainer(gamemode, user.id)
         data = database.get_panel_data(gamemode, user.id)
         emoji = next((e for n, e in config.gamemodes if n == gamemode), "")
         embed = discord.Embed(title=f"{emoji} {gamemode} Trainer - {data['ign']}" if emoji else f"{gamemode} Trainer - {data['ign']}", description=data['description'] + "\n\n" + f"**💸 Price: ${data['price']} USD**", color=data['colour'])
-        embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{data['ign']}")
+        embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{quote(data['ign'])}")
         embed.set_footer(text=f"{data['ign']} has completed {data['lessons']} lessons.")
         view = AdminPanelView(gamemode, user.id, embed, data["active"])
         [setattr(c, 'label', "Set inactive" if data["active"] else "Set active") for c in view.children if c == view.toggle_active]

@@ -27,7 +27,10 @@ async def setup(bot):
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
             import reviews
             trainer = await interaction.client.fetch_user(trainer_id)
-            await (await interaction.client.fetch_user(ticket_info["customer_id"])).send(f"Your {gamemode} lesson by {trainer.mention} was completed.\n\nWould you like to submit a review?", view=reviews.ReviewSubmissionView())
+            try:
+                await (await interaction.client.fetch_user(ticket_info["customer_id"])).send(f"Your {gamemode} lesson by {trainer.mention} was completed.\n\nWould you like to submit a review?", view=reviews.ReviewSubmissionView())
+            except discord.Forbidden:
+                pass
         except:
             pass
         message_id = database.get_panel_message_id(gamemode, trainer_id)
@@ -39,9 +42,10 @@ async def setup(bot):
                     import sys, os
                     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
                     import purchase
+                    from urllib.parse import quote
                     data = database.get_panel_data(gamemode, trainer_id)
                     embed = discord.Embed(title=f"{emoji} {gamemode} Trainer - {data['ign']}" if emoji else f"{gamemode} Trainer - {data['ign']}", description=data['description'] + "\n\n" + f"**💸 Price: ${data['price']} USD**", color=data['colour'])
-                    embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{data['ign']}")
+                    embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{quote(data['ign'])}")
                     embed.set_footer(text=f"{data['ign']} has completed {data['lessons']} lessons.")
                     await (await channel.fetch_message(message_id)).edit(embed=embed, view=purchase.PurchaseView(active=data["active"]))
                 except:

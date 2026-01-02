@@ -31,9 +31,10 @@ class ReviewModal(discord.ui.Modal, title="Submit Review"):
         import re
         gamemode = re.search(r'Your (.+?) lesson by', self.message.content).group(1)
         trainer_id = int(re.search(r'<@(\d+)>', self.message.content).group(1))
+        from urllib.parse import quote
         trainer_ign = database.get_trainer_ign(gamemode, trainer_id) or "Unknown"
         embed = discord.Embed(title=f"New {gamemode} review of {trainer_ign}!", description=f"{'⭐' * int(rating_value)}\n\n{self.review_input.value}")
-        embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{trainer_ign}")
+        embed.set_thumbnail(url=f"https://render.crafty.gg/3d/bust/{quote(trainer_ign)}")
         embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar.url)
         review_message = await next((c for c in interaction.client.get_guild(config.guild_id).channels if c.name.lower() == config.review_channel.lower()), None).send(embed=embed)
         await interaction.response.send_message(f"Review submitted ({review_message.jump_url})", ephemeral=True)

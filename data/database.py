@@ -48,7 +48,15 @@ except:
     pass
 conn.commit()
 
+def ensure_conn():
+    global conn
+    try:
+        conn.ping(reconnect=False)
+    except:
+        conn = get_conn()
+
 def add_trainer(gamemode, user_id):
+    ensure_conn()
     defaults = ("Example", "10", 3092790, "# **This** __is__ *an* ~~example~~ `description`\n\n## **This** __is__ *an* ~~example~~ `description`\n\n### **This** __is__ *an* ~~example~~ `description`\n\n**This** __is__ *an* ~~example~~ `description`\n\n-# **This** __is__ *an* ~~example~~ `description`", 1, 0)
     cursor = conn.cursor()
     cursor.execute('SELECT COUNT(*) FROM trainers WHERE gamemode = %s AND user_id = %s', (gamemode, user_id))
@@ -57,23 +65,27 @@ def add_trainer(gamemode, user_id):
         conn.commit()
 
 def get_panel_message_id(gamemode, user_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('SELECT message_id FROM trainers WHERE gamemode = %s AND user_id = %s', (gamemode, user_id))
     row = cursor.fetchone()
     return row[0] if row else None
 
 def get_trainer_by_message(message_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('SELECT user_id, gamemode FROM trainers WHERE message_id = %s', (message_id,))
     row = cursor.fetchone()
     return {"user_id": row[0], "gamemode": row[1]} if row else None
 
 def set_panel_message_id(gamemode, user_id, message_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('UPDATE trainers SET message_id = %s WHERE gamemode = %s AND user_id = %s', (message_id, gamemode, user_id))
     conn.commit()
 
 def get_panel_data(gamemode, user_id):
+    ensure_conn()
     defaults = ("Example", "10", 3092790, "# **This** __is__ *an* ~~example~~ `description`\n\n## **This** __is__ *an* ~~example~~ `description`\n\n### **This** __is__ *an* ~~example~~ `description`\n\n**This** __is__ *an* ~~example~~ `description`\n\n-# **This** __is__ *an* ~~example~~ `description`", 1, 0)
     cursor = conn.cursor()
     cursor.execute('SELECT COALESCE(ign, %s), COALESCE(price, %s), COALESCE(colour, %s), COALESCE(description, %s), COALESCE(active, %s), COALESCE(lessons, %s) FROM trainers WHERE gamemode = %s AND user_id = %s', (*defaults, gamemode, user_id))
@@ -83,52 +95,61 @@ def get_panel_data(gamemode, user_id):
 _defaults = ("Example", "10", 3092790, "# **This** __is__ *an* ~~example~~ `description`\n\n## **This** __is__ *an* ~~example~~ `description`\n\n### **This** __is__ *an* ~~example~~ `description`\n\n**This** __is__ *an* ~~example~~ `description`\n\n-# **This** __is__ *an* ~~example~~ `description`")
 
 def set_panel_ign(gamemode, user_id, ign):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
     cursor.execute('UPDATE trainers SET ign = %s, price = COALESCE(price, %s), colour = COALESCE(colour, %s), description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (ign, _defaults[1], _defaults[2], _defaults[3], gamemode, user_id))
     conn.commit()
 
 def set_panel_price(gamemode, user_id, price):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
     cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = %s, colour = COALESCE(colour, %s), description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (_defaults[0], price, _defaults[2], _defaults[3], gamemode, user_id))
     conn.commit()
 
 def set_panel_colour(gamemode, user_id, colour):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
     cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = COALESCE(price, %s), colour = %s, description = COALESCE(description, %s) WHERE gamemode = %s AND user_id = %s', (_defaults[0], _defaults[1], colour, _defaults[3], gamemode, user_id))
     conn.commit()
 
 def set_panel_description(gamemode, user_id, description):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('INSERT IGNORE INTO trainers (gamemode, user_id, ign, price, colour, description) VALUES (%s, %s, %s, %s, %s, %s)', (gamemode, user_id, *_defaults[:4]))
     cursor.execute('UPDATE trainers SET ign = COALESCE(ign, %s), price = COALESCE(price, %s), colour = COALESCE(colour, %s), description = %s WHERE gamemode = %s AND user_id = %s', (_defaults[0], _defaults[1], _defaults[2], description, gamemode, user_id))
     conn.commit()
 
 def add_ticket(channel_id, trainer_id, customer_id, gamemode):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('REPLACE INTO tickets (channel_id, trainer_id, customer_id, gamemode) VALUES (%s, %s, %s, %s)', (channel_id, trainer_id, customer_id, gamemode))
     conn.commit()
 
 def get_ticket_info(channel_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('SELECT trainer_id, customer_id, gamemode FROM tickets WHERE channel_id = %s', (channel_id,))
     row = cursor.fetchone()
     return {"trainer_id": row[0], "customer_id": row[1], "gamemode": row[2]} if row else None
 
 def remove_ticket(channel_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM tickets WHERE channel_id = %s', (channel_id,))
     conn.commit()
 
 def get_trainer_ign(gamemode, trainer_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('SELECT ign FROM trainers WHERE gamemode = %s AND user_id = %s', (gamemode, trainer_id))
     row = cursor.fetchone()
     return row[0] if row else None
 
 def toggle_active(gamemode, user_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('SELECT active FROM trainers WHERE gamemode = %s AND user_id = %s', (gamemode, user_id))
     row = cursor.fetchone()
@@ -139,6 +160,7 @@ def toggle_active(gamemode, user_id):
     return bool(new_active)
 
 def increment_lessons(gamemode, user_id):
+    ensure_conn()
     cursor = conn.cursor()
     cursor.execute('UPDATE trainers SET lessons = COALESCE(lessons, 0) + 1 WHERE gamemode = %s AND user_id = %s', (gamemode, user_id))
     conn.commit()

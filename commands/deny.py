@@ -16,7 +16,10 @@ class DenyModal(discord.ui.Modal, title="Deny Request"):
         await self.message.edit(view=self.view)
         requester_id = int(re.search(r'<@(\d+)>', self.embed.description).group(1))
         gamemode = re.search(r'\*\*Gamemode:\*\* .+? (.+)', self.embed.description).group(1)
-        await (await interaction.client.fetch_user(requester_id)).send(f"Your {gamemode} training request has been denied.\n\nReason: {self.reason_input.value}")
+        try:
+            await (await interaction.client.fetch_user(requester_id)).send(f"Your {gamemode} training request has been denied.\n\nReason: {self.reason_input.value}")
+        except discord.Forbidden:
+            pass
         await interaction.followup.send("Request denied.", ephemeral=True)
 
 async def setup(bot):

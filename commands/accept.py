@@ -14,7 +14,10 @@ async def handle_accept(interaction: discord.Interaction, embed: discord.Embed):
     trainer = await interaction.client.fetch_user(trainer_id)
     requester = await interaction.client.fetch_user(requester_id)
     ticket_channel = await ticket.create_ticket(interaction.client.get_guild(config.guild_id), gamemode, trainer, requester)
-    await requester.send(f"Your {gamemode} training request has been accepted. ({ticket_channel.mention})")
+    try:
+        await requester.send(f"Your {gamemode} training request has been accepted. ({ticket_channel.mention})")
+    except discord.Forbidden:
+        pass
     view = discord.ui.View()
     [view.add_item(discord.ui.Button(label=l, style=s, disabled=True, custom_id=c)) for l, s, c in [("Accept", discord.ButtonStyle.success, "accept_request"), ("Deny", discord.ButtonStyle.danger, "deny_request")]]
     await interaction.message.edit(view=view)
