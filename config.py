@@ -4,6 +4,7 @@ gamemodes = [
     ("NetheritePot", "🧪"),
     ("Axe", "🪓"),
     ("UHC", "🕸️"),
+    ("DiamondSMP", "🔷")
     ("SMP", "🏹"),
     ("Mace", "🔨"),
     ("Crystal", "🔮")
